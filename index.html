@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Integrasi Ringkas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f4f4f9; }
+        .container { background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        label { font-weight: bold; margin-top: 10px; display: block; }
+        input { margin: 8px 0 15px 0; padding: 10px; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 12px 15px; width: 100%; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #218838; }
+        #result { margin-top: 20px; font-weight: bold; font-size: 1.2em; text-align: center; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Kalkulator Luas Pengamiran</h2>
+        
+        <label>Fungsi f(x):</label>
+        <input type="text" id="func" value="x^2 - 5x + 6" placeholder="Contoh: x^2 - 5x + 6">
+
+        <label>Sempadan Bawah (a):</label>
+        <input type="number" id="lower" value="4">
+
+        <label>Sempadan Atas (b):</label>
+        <input type="number" id="upper" value="5">
+
+        <button onclick="kiraLuas()">Kira Luas</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function kiraLuas() {
+            const funcStr = document.getElementById('func').value;
+            const a = parseFloat(document.getElementById('lower').value);
+            const b = parseFloat(document.getElementById('upper').value);
+
+            if (isNaN(a) || isNaN(b)) {
+                document.getElementById('result').innerText = "Sila masukkan nombor sempadan yang sah.";
+                return;
+            }
+
+            try {
+                const node = math.parse(funcStr);
+                const code = node.compile();
+
+                // Pengiraan berangka menggunakan Petua Trapezium
+                const n = 1000; 
+                const dx = (b - a) / n;
+                let area = 0;
+
+                for (let i = 0; i <= n; i++) {
+                    let x = a + i * dx;
+                    let y = code.evaluate({x: x});
+                    if (i === 0 || i === n) {
+                        area += y / 2;
+                    } else {
+                        area += y;
+                    }
+                }
+                area *= dx;
+
+                document.getElementById('result').innerText = "Anggaran Luas: " + area.toFixed(4);
+            } catch (err) {
+                document.getElementById('result').innerText = "Ralat membaca fungsi. Pastikan format betul (cth: x^2).";
+            }
+        }
+    </script>
+</body>
+</html>
